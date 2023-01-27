@@ -1,8 +1,8 @@
 #include <iostream>
 #include <Windows.h>
 #include <vector>
-#include <map>
 #include <math.h>
+#include <thread>
 
 std::vector<RECT> monitorRects;
 
@@ -17,21 +17,6 @@ const void GetMonitorRects()
     monitorRects.clear();
     EnumDisplayMonitors(NULL, NULL, MonitorEnumProc, 0);
 }
-
-// To delete
-template <typename T>
-const void print(const T &data)
-{
-    std::cout << data << std::endl;
-}
-
-template <typename T, typename... Args>
-const void print(const T &first, const Args &...args)
-{
-    std::cout << first << " ";
-    print(args...);
-}
-// To delete
 
 // Calculate the distance between two points
 const double getDistance(POINT point1, POINT point2)
@@ -86,15 +71,17 @@ const void centerWindow(HWND hwnd)
     }
 }
 
-// Center the currently opened window
-const void centerForegroundWindow() {
+// Center the focused window
+const void centerForegroundWindow()
+{
     const HWND hwnd = GetForegroundWindow();
-    if (!hwnd) return;
+    if (!hwnd)
+        return;
     centerWindow(hwnd);
 }
 
 // Detect triple shift press and execute callback
-const void onTripleShiftPress(const void (*callback)())
+const void registerTripleShiftPressEventHandler()
 {
     // Init variables
     int shiftPressCount = 0;
@@ -114,7 +101,7 @@ const void onTripleShiftPress(const void (*callback)())
 
                 if (shiftPressCount >= 3)
                 {
-                    callback(); // Call callback
+                    centerForegroundWindow(); // Call the target function
                     shiftPressCount = 0;
                 }
                 prevTime = currentTime;
@@ -133,8 +120,46 @@ const void onTripleShiftPress(const void (*callback)())
     }
 }
 
+void CALLBACK WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+{
+    if (event == EVENT_OBJECT_CREATE && IsWindow(hwnd) && IsWindowVisible(hwnd))
+    {
+        centerForegroundWindow(); // Call the target function
+    }
+}
+
+const void registerWindowOpenEventHandler()
+{
+    // Set the hook to listen for new window events
+    HWINEVENTHOOK hWinEventHook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT);
+    if (hWinEventHook == NULL)
+    {
+        std::cout << "Failed to set hook" << std::endl;
+        return;
+    }
+
+    // Run the message loop
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    // Unhook the event
+    UnhookWinEvent(hWinEventHook);
+}
+
 int main()
 {
-    onTripleShiftPress(centerForegroundWindow);
+    std::thread th1(registerWindowOpenEventHandler);
+    std::thread th2(registerTripleShiftPressEventHandler);
+    
+    th1.join();
+    th2.join();
+
     return 0;
 }
+
+// TODO: Add support for system apps such as task manager
+// TODO: Reduce event calls. Do not fire on window deminimization
