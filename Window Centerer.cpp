@@ -165,6 +165,8 @@ int main()
     return 0;
 }
 
+// TODO: App installer
+// TODO: Do not start the application twice
 // TODO: Add support for system apps such as task manager
 // TODO: Notifications
-// FIXME: Window preview on taskbar moves to the middle of the screen too
+// FIXME: Some non-window elements are also moved to the middle of the screen. For example the taskbar window preview.
