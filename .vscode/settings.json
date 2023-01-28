@@ -44,6 +44,11 @@
         "typeinfo": "cpp",
         "deque": "cpp",
         "numeric": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "ctime": "cpp",
+        "ratio": "cpp",
+        "semaphore": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp"
     }
 }
