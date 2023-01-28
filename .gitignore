@@ -1,2 +1,5 @@
-.vscode/
-Window Centerer.exe
+# IDE - VS Code
+.vscode/*
+
+# Build
+Build/*

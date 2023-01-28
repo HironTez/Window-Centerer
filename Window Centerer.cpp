@@ -166,5 +166,5 @@ int main()
 }
 
 // TODO: Add support for system apps such as task manager
-// TODO: Add app icon
-// TODO: Run the app without the console
+// TODO: Notifications
+// FIXME: Window preview on taskbar moves to the middle of the screen too

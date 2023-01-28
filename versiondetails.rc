@@ -1,0 +1,23 @@
+1 VERSIONINFO
+PRODUCTVERSION  0,0,1,0
+FILEVERSION     0,0,1,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080904E4"
+    BEGIN
+      VALUE "CompanyName", "Hiron Tez"
+      VALUE "FileDescription", "Center your windows automatically. Source code: https://github.com/HironTez/Window-Centerer"
+      VALUE "FileVersion", "0.0.1.0"
+      VALUE "InternalName", "window-centerer"
+      VALUE "LegalCopyright", "Hiron Tez"
+      VALUE "OriginalFilename", "Window Centerer.exe"
+      VALUE "ProductName", "Window Centerer"
+      VALUE "ProductVersion", "0.0.1.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x809, 1252
+  END
+END
