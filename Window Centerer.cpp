@@ -120,41 +120,45 @@ const void registerTripleShiftPressEventHandler()
     }
 }
 
-void CALLBACK WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+HWINEVENTHOOK g_hHook = NULL;
+
+BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
-    if (event == EVENT_OBJECT_CREATE && IsWindow(hwnd) && IsWindowVisible(hwnd))
+    DWORD dwThreadId, dwProcessId;
+    dwThreadId = GetWindowThreadProcessId(hwnd, &dwProcessId);
+    if (dwThreadId == (DWORD)lParam)
     {
-        centerForegroundWindow(); // Call the target function
+        centerWindow(hwnd);
+    }
+    return TRUE;
+}
+
+VOID CALLBACK WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+{
+    if (event == EVENT_OBJECT_CREATE)
+    {
+        DWORD dwThreadId = GetWindowThreadProcessId(hwnd, NULL);
+        EnumThreadWindows(dwThreadId, EnumWindowsProc, dwThreadId);
     }
 }
 
 const void registerWindowOpenEventHandler()
 {
-    // Set the hook to listen for new window events
-    HWINEVENTHOOK hWinEventHook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT);
-    if (hWinEventHook == NULL)
-    {
-        std::cout << "Failed to set hook" << std::endl;
-        return;
-    }
-
-    // Run the message loop
+    g_hHook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT);
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-
-    // Unhook the event
-    UnhookWinEvent(hWinEventHook);
+    UnhookWinEvent(g_hHook);
 }
 
 int main()
 {
     std::thread th1(registerWindowOpenEventHandler);
     std::thread th2(registerTripleShiftPressEventHandler);
-    
+
     th1.join();
     th2.join();
 
@@ -162,4 +166,5 @@ int main()
 }
 
 // TODO: Add support for system apps such as task manager
-// TODO: Reduce event calls. Do not fire on window deminimization
+// TODO: Add app icon
+// TODO: Run the app without the console
