@@ -74,10 +74,7 @@ const void centerWindow(HWND hwnd)
 // Center the focused window
 const void centerForegroundWindow()
 {
-    const HWND hwnd = GetForegroundWindow();
-    if (!hwnd)
-        return;
-    centerWindow(hwnd);
+    centerWindow(GetForegroundWindow());
 }
 
 // Detect triple shift press and execute callback
@@ -135,7 +132,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
 
 VOID CALLBACK WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
-    if (event == EVENT_OBJECT_CREATE)
+    if (event == EVENT_OBJECT_CREATE && IsWindowEnabled(hwnd) && IsWindowVisible(hwnd))
     {
         DWORD dwThreadId = GetWindowThreadProcessId(hwnd, NULL);
         EnumThreadWindows(dwThreadId, EnumWindowsProc, dwThreadId);
@@ -169,4 +166,3 @@ int main()
 // TODO: Do not start the application twice
 // TODO: Add support for system apps such as task manager
 // TODO: Notifications
-// FIXME: Some non-window elements are also moved to the middle of the screen. For example the taskbar window preview.
