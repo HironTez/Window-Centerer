@@ -36,22 +36,22 @@ const void centerWindow(HWND hwnd)
     GetWindowRect(hwnd, &windowRect);
     const long windowWidth = windowRect.right - windowRect.left;
     const long windowHeight = windowRect.bottom - windowRect.top;
-    const POINT windowCenter = {windowRect.left + windowWidth / 2, windowRect.top + windowHeight / 2};
+    const POINT windowCenter = { windowRect.left + windowWidth / 2, windowRect.top + windowHeight / 2 };
 
     // Get the number of monitors
     const int numMonitors = GetSystemMetrics(SM_CMONITORS);
 
     // Find the closest monitor
     double closestDistance = 0;
-    POINT closestMonitorCenter = {0, 0};
+    POINT closestMonitorCenter = { 0, 0 };
 
     // Get rects of monitors
     GetMonitorRects();
     for (int i = 0; i < numMonitors; i++)
     {
         // Get the rect of the monitor
-        const RECT &rect = monitorRects[i];
-        const POINT monitorCenter = {rect.left + (rect.right - rect.left) / 2, rect.top + (rect.bottom - rect.top) / 2};
+        const RECT& rect = monitorRects[i];
+        const POINT monitorCenter = { rect.left + (rect.right - rect.left) / 2, rect.top + (rect.bottom - rect.top) / 2 };
 
         // Calculate distance between the center of the monitor and the center of the window
         const int distance = getDistance(windowCenter, monitorCenter);
