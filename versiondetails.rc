@@ -1,6 +1,6 @@
 1 VERSIONINFO
-PRODUCTVERSION  0,0,2,0
-FILEVERSION     0,0,2,0
+PRODUCTVERSION  0,0,3,0
+FILEVERSION     0,0,3,0
 BEGIN
   BLOCK "StringFileInfo"
   BEGIN
@@ -8,12 +8,12 @@ BEGIN
     BEGIN
       VALUE "CompanyName", "Hiron Tez"
       VALUE "FileDescription", "Window Centerer"
-      VALUE "FileVersion", "0.0.2.0"
+      VALUE "FileVersion", "0.0.3.0"
       VALUE "InternalName", "window-centerer"
       VALUE "LegalCopyright", "Hiron Tez"
       VALUE "OriginalFilename", "Window Centerer.exe"
       VALUE "ProductName", "Window Centerer"
-      VALUE "ProductVersion", "0.0.2.0"
+      VALUE "ProductVersion", "0.0.3.0"
     END
   END
   BLOCK "VarFileInfo"

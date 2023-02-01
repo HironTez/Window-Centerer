@@ -117,38 +117,33 @@ const void registerTripleShiftPressEventHandler()
     }
 }
 
-HWINEVENTHOOK g_hHook = NULL;
-
-BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam)
+bool IsTopLevelWindow(HWND window)
 {
-    DWORD dwThreadId, dwProcessId;
-    dwThreadId = GetWindowThreadProcessId(hwnd, &dwProcessId);
-    if (dwThreadId == (DWORD)lParam)
-    {
-        centerWindow(hwnd);
-    }
-    return TRUE;
+    long style = ::GetWindowLong(window, GWL_STYLE);
+    if (!(style & WS_CHILD))
+        return true;
+    HWND parent = ::GetParent(window);
+    return !parent || (parent == ::GetDesktopWindow());
 }
 
 VOID CALLBACK WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
-    if (event == EVENT_OBJECT_CREATE && IsWindowEnabled(hwnd) && IsWindowVisible(hwnd))
+    if (IsTopLevelWindow(hwnd))
     {
-        DWORD dwThreadId = GetWindowThreadProcessId(hwnd, NULL);
-        EnumThreadWindows(dwThreadId, EnumWindowsProc, dwThreadId);
+        centerWindow(hwnd);
     }
 }
 
 const void registerWindowOpenEventHandler()
 {
-    g_hHook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT);
+    HWINEVENTHOOK hHook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT);
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
-    UnhookWinEvent(g_hHook);
+    UnhookWinEvent(hHook);
 }
 
 int main()
