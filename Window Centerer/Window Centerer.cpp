@@ -12,6 +12,7 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
     return TRUE;
 }
 
+// Get rects of monitors
 const void GetMonitorRects()
 {
     monitorRects.clear();
@@ -25,15 +26,15 @@ const double getDistance(POINT point1, POINT point2)
 }
 
 // Center provided window
-const void centerWindow(HWND hwnd)
+const void centerWindow(HWND window)
 {
     // If no window is provided
-    if (!hwnd)
+    if (!window)
         return;
 
     // Get the rect of the window
     RECT windowRect;
-    GetWindowRect(hwnd, &windowRect);
+    GetWindowRect(window, &windowRect);
     const long windowWidth = windowRect.right - windowRect.left;
     const long windowHeight = windowRect.bottom - windowRect.top;
     const POINT windowCenter = {windowRect.left + windowWidth / 2, windowRect.top + windowHeight / 2};
@@ -41,11 +42,11 @@ const void centerWindow(HWND hwnd)
     // Get the number of monitors
     const int numMonitors = GetSystemMetrics(SM_CMONITORS);
 
-    // Find the closest monitor
+    // Closest monitor
     double closestDistance = 0;
     POINT closestMonitorCenter = {0, 0};
 
-    // Get rects of monitors
+    // Find the closest monitor
     GetMonitorRects();
     for (int i = 0; i < numMonitors; i++)
     {
@@ -56,7 +57,7 @@ const void centerWindow(HWND hwnd)
         // Calculate distance between the center of the monitor and the center of the window
         const int distance = getDistance(windowCenter, monitorCenter);
 
-        // If it's the closest monitor and the window is not centered, save the coordinates
+        // If it's the closest monitor and the window is not centered, save the point
         if ((distance < closestDistance || closestDistance == 0) && distance)
         {
             closestDistance = distance;
@@ -66,9 +67,7 @@ const void centerWindow(HWND hwnd)
 
     // Set window position
     if (closestDistance)
-    {
-        SetWindowPos(hwnd, HWND_TOP, closestMonitorCenter.x - windowWidth / 2, closestMonitorCenter.y - windowHeight / 2, 0, 0, SWP_NOSIZE);
-    }
+        SetWindowPos(window, HWND_TOP, closestMonitorCenter.x - windowWidth / 2, closestMonitorCenter.y - windowHeight / 2, 0, 0, SWP_NOSIZE);
 }
 
 // Center the focused window
@@ -134,27 +133,28 @@ const void registerTripleShiftPressEventHandler()
 // Check if the window is a top-level window
 bool IsTopLevelWindow(HWND window)
 {
-    long style = ::GetWindowLong(window, GWL_STYLE);
-    if (!(style & WS_CHILD))
-        return true;
+    bool hasChildStyle = ::GetWindowLong(window, GWL_STYLE) & WS_CHILD;
     HWND parent = ::GetParent(window);
-    return !parent || (parent == ::GetDesktopWindow());
+    bool hasParent = (parent && (parent != ::GetDesktopWindow())) && GetWindow(window, GW_OWNER) != NULL;
+    return !hasChildStyle && !hasParent;
 }
 
-VOID CALLBACK WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND hwnd, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
+// Detect new window opening
+VOID CALLBACK WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND window, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
-    if (IsTopLevelWindow(hwnd))
+    if (IsTopLevelWindow(window))
     {
-        centerWindow(hwnd);
+        centerWindow(window);
     }
 }
 
+// Register the window opening event handler
 const void registerWindowOpenEventHandler()
 {
     HWINEVENTHOOK hHook = SetWinEventHook(EVENT_OBJECT_CREATE, EVENT_OBJECT_CREATE, NULL, WinEventProc, 0, 0, WINEVENT_OUTOFCONTEXT);
     if (!hHook)
         return;
-        
+
     MSG msg;
     while (GetMessage(&msg, NULL, 0, 0))
     {
@@ -181,7 +181,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return 0;
 }
 
+// TODO: Notifications
 // TODO: App installer
 // TODO: Do not start the application twice
-// TODO: Add support for system apps such as task manager
-// TODO: Notifications
+// ? TODO: Add support for system apps such as task manager
