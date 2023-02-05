@@ -133,16 +133,24 @@ const void registerTripleShiftPressEventHandler()
 // Check if the window is a top-level window
 bool IsTopLevelWindow(HWND window)
 {
-    bool hasChildStyle = ::GetWindowLong(window, GWL_STYLE) & WS_CHILD;
-    HWND parent = ::GetParent(window);
-    bool hasParent = (parent && (parent != ::GetDesktopWindow())) && GetWindow(window, GW_OWNER) != NULL;
+    bool hasChildStyle = GetWindowLong(window, GWL_STYLE) & WS_CHILD;
+    HWND parent = GetParent(window);
+    bool hasParent = parent && (parent != GetDesktopWindow()) && GetWindow(window, GW_OWNER) != NULL;
     return !hasChildStyle && !hasParent;
+}
+
+// Check if the window is an application
+bool IsAppWindow(HWND window)
+{
+    char title[2];
+    GetWindowTextA(window, title, 2);
+    return IsWindowEnabled(window) && strlen(title);
 }
 
 // Detect new window opening
 VOID CALLBACK WinEventProc(HWINEVENTHOOK hWinEventHook, DWORD event, HWND window, LONG idObject, LONG idChild, DWORD dwEventThread, DWORD dwmsEventTime)
 {
-    if (IsTopLevelWindow(window))
+    if (IsTopLevelWindow(window) && IsAppWindow(window))
     {
         centerWindow(window);
     }
