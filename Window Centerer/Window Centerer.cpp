@@ -85,26 +85,36 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
     KBDLLHOOKSTRUCT *pKeyBoard = (KBDLLHOOKSTRUCT *)lParam;
 
-    // If shift is pressed
-    if (nCode == HC_ACTION && wParam == WM_KEYUP && pKeyBoard->vkCode == 160)
+    // If a key is pressed
+    if (nCode == HC_ACTION && wParam == WM_KEYUP)
     {
-        // Reset the counter if the delay was too long
-        int currentTime = clock();
-        if ((currentTime - prevTime) / CLOCKS_PER_SEC >= 0.2)
+        // If shift is pressed
+        if (pKeyBoard->vkCode == 160)
         {
-            shiftPressCount = 0;
+            // Reset the counter if the delay was too long
+            int currentTime = clock();
+            if ((currentTime - prevTime) / CLOCKS_PER_SEC >= 0.2)
+            {
+                shiftPressCount = 0;
+            }
+
+            // Increment the counter
+            shiftPressCount += 1;
+            prevTime = currentTime;
+
+            // If it was a triple press
+            if (shiftPressCount >= 3)
+            {
+                centerForegroundWindow(); // Call the target function
+
+                // Reset the counter
+                shiftPressCount = 0;
+                prevTime = 0;
+            }
         }
-
-        // Increment the counter
-        shiftPressCount += 1;
-        prevTime = currentTime;
-
-        // If it was a triple press
-        if (shiftPressCount >= 3)
+        // Reset variables if another key is pressed
+        else
         {
-            centerForegroundWindow(); // Call the target function
-
-            // Reset the counter
             shiftPressCount = 0;
             prevTime = 0;
         }
@@ -189,7 +199,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     return 0;
 }
 
+// TODO: Settings
 // TODO: Notifications
-// TODO: App installer
 // TODO: Do not start the application twice
 // ? TODO: Add support for system apps such as task manager
