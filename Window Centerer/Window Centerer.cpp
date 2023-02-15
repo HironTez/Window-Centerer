@@ -43,7 +43,7 @@ const void centerWindow(HWND window)
     const int numMonitors = GetSystemMetrics(SM_CMONITORS);
 
     // Closest monitor
-    double closestDistance = 0;
+    double closestDistance = -1;
     POINT closestMonitorCenter = {0, 0};
 
     // Find the closest monitor
@@ -58,7 +58,7 @@ const void centerWindow(HWND window)
         const int distance = getDistance(windowCenter, monitorCenter);
 
         // If it's the closest monitor and the window is not centered, save the point
-        if ((distance < closestDistance || closestDistance == 0) && distance)
+        if ((distance < closestDistance || closestDistance == -1) && distance)
         {
             closestDistance = distance;
             closestMonitorCenter = monitorCenter;
@@ -66,7 +66,7 @@ const void centerWindow(HWND window)
     }
 
     // Set window position
-    if (closestDistance)
+    if (closestDistance > 1)
         SetWindowPos(window, HWND_TOP, closestMonitorCenter.x - windowWidth / 2, closestMonitorCenter.y - windowHeight / 2, 0, 0, SWP_NOSIZE);
 }
 
