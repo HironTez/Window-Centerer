@@ -25,11 +25,21 @@ const double getDistance(POINT point1, POINT point2)
     return hypot(point2.x - point1.x, point2.y - point1.y);
 }
 
+bool IsWindowFullscreen(HWND hwnd)
+{
+    WINDOWPLACEMENT placement = { sizeof(WINDOWPLACEMENT) };
+    return (GetWindowPlacement(hwnd, &placement) && placement.showCmd == SW_SHOWMAXIMIZED);
+}
+
 // Center provided window
 const void centerWindow(HWND window)
 {
     // If no window is provided
     if (!window)
+        return;
+
+    // If window is in a fullscreen mode
+    if (IsWindowFullscreen(window))
         return;
 
     // Get the rect of the window
