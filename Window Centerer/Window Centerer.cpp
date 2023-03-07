@@ -213,7 +213,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Wait for threads to complete or exit when at least one thread is finished
     while (!isExit)
     {
-        if (th1.joinable() && th1.joinable() && th1.joinable())
+        if (th1.joinable() && th2.joinable() && th3.joinable())
         {
             th1.join();
             th2.join();
