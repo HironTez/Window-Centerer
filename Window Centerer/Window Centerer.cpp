@@ -1,9 +1,7 @@
 #include <iostream>
-#include <Windows.h>
 #include <vector>
 #include <math.h>
 #include <thread>
-#include <atomic>
 
 #include "./global.h"
 #include "./trayicon.h"

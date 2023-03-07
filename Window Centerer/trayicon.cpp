@@ -1,6 +1,3 @@
-#include <windows.h>
-#include <shellapi.h>
-
 #include "./global.h"
 
 #define WM_TRAYICON (WM_USER + 1)
