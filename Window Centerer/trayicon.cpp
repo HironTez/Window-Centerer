@@ -1,9 +1,11 @@
 #include <windows.h>
 #include <shellapi.h>
 
+#include "./global.h"
+
 #define WM_TRAYICON (WM_USER + 1)
 
-void ShowContextMenu(HWND hwnd, POINT pt)
+const void ShowContextMenu(HWND hwnd, POINT pt)
 {
     HMENU hMenu = CreatePopupMenu();
     InsertMenu(hMenu, -1, MF_BYPOSITION | MF_STRING, 1, TEXT("Settings"));
@@ -15,7 +17,7 @@ void ShowContextMenu(HWND hwnd, POINT pt)
     DestroyMenu(hMenu);
 }
 
-void OnTrayIcon(HWND hwnd, UINT uMsg, UINT uID, DWORD dwMessage)
+const void OnTrayIcon(HWND hwnd, UINT uMsg, UINT uID, DWORD dwMessage)
 {
     if (uID != 1)
     {
@@ -30,7 +32,7 @@ void OnTrayIcon(HWND hwnd, UINT uMsg, UINT uID, DWORD dwMessage)
     }
 }
 
-void AddTrayIcon(HWND hwnd)
+const void AddTrayIcon(HWND hwnd)
 {
     NOTIFYICONDATA nid;
     ZeroMemory(&nid, sizeof(nid));
@@ -45,7 +47,7 @@ void AddTrayIcon(HWND hwnd)
     Shell_NotifyIcon(NIM_ADD, &nid);
 }
 
-void RemoveTrayIcon(HWND hwnd)
+const void RemoveTrayIcon(HWND hwnd)
 {
     NOTIFYICONDATA nid;
     ZeroMemory(&nid, sizeof(nid));
@@ -91,4 +93,32 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 
     return 0;
+}
+
+const void registerTrayIcon(HINSTANCE hInstance)
+{
+    // Register the window class
+    WNDCLASSEX wcex = {0};
+    wcex.cbSize = sizeof(WNDCLASSEX);
+    wcex.lpfnWndProc = WndProc;
+    wcex.hInstance = hInstance;
+    wcex.lpszClassName = (LPCWSTR) "Window Centerer";
+    RegisterClassEx(&wcex);
+
+    // Create a hidden window
+    HWND hWnd = CreateWindowEx(0, (LPCWSTR) "Window Centerer", NULL, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL, hInstance, NULL);
+    if (!hWnd)
+    {
+        isExit = true;
+        return;
+    }
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    isExit = true;
 }

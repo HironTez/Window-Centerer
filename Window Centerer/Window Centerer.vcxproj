@@ -127,10 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="global.cpp" />
+    <ClCompile Include="trayicon.cpp" />
     <ClCompile Include="Window Centerer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="global.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="trayicon.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Window Centerer.rc" />
